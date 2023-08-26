@@ -1,6 +1,5 @@
 package com.bootcamp.backend.skill;
 
-import com.bootcamp.backend.employee.Employee;
 import com.bootcamp.backend.exceptions.AlreadyExistsException;
 import com.bootcamp.backend.exceptions.NotFoundException;
 import org.springframework.stereotype.Service;
