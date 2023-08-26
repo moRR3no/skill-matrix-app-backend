@@ -25,37 +25,22 @@ public class ProjectController {
 
     @GetMapping("/{projectId}")
     public ResponseEntity<Project> getProjectById(@PathVariable("projectId") UUID projectId) {
-        try {
-            Project project = projectService.getProjectById(projectId);
-            return new ResponseEntity<>(project, HttpStatus.OK);
-        } catch (RuntimeException e) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
+        return new ResponseEntity<>(projectService.getProjectById(projectId), HttpStatus.OK);
     }
 
-    @PostMapping
+    @PostMapping()
     public ResponseEntity<Project> addProject(@RequestBody Project project) {
         return new ResponseEntity<>(projectService.saveProject(project), HttpStatus.CREATED);
     }
 
     @PutMapping("/{projectId}")
-    public ResponseEntity<Project> updateProject(@PathVariable("projectId") UUID projectId, @RequestBody Project updatedProject) {
-        try {
-            Project existingProject = projectService.getProjectById(projectId);
-            existingProject.setName(updatedProject.getName());
-            return new ResponseEntity<>(projectService.saveProject(existingProject), HttpStatus.OK);
-        } catch (RuntimeException e) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
+    public ResponseEntity<Project> updateProject(@RequestBody Project updatedProject) {
+        return new ResponseEntity<>(projectService.saveProject(updatedProject), HttpStatus.OK);
     }
 
     @DeleteMapping("/{projectId}")
     public ResponseEntity<HttpStatus> deleteProject(@PathVariable UUID projectId) {
-        try {
-            projectService.deleteById(projectId);
-            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-        } catch (RuntimeException e) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
+        projectService.deleteById(projectId);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 }

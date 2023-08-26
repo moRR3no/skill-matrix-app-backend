@@ -29,22 +29,10 @@ public class SkillService {
 
     public Skill saveSkill(Skill skill) {
         String skillName = skill.getName();
-        Optional<Skill> existingSkill = skillRepository.findByName(skillName);
-        if (existingSkill.isPresent()) {
+        if (skillRepository.existsByName(skillName)) {
             throw new AlreadyExistsException("Skill with name " + skillName + " already exists.");
-        }
-        return skillRepository.save(skill);
-    }
-
-    public Skill updateSkill(Skill skill) {
-        UUID skillId = skill.getId();
-        Optional<Skill> existingSkill = skillRepository.findById(skill.getId());
-        if (existingSkill.isPresent()) {
-            Skill updatedSkill = existingSkill.get();
-            updatedSkill.setName(skill.getName());
-            return skillRepository.save(updatedSkill);
         } else {
-            throw new NotFoundException("Skill not found with id=" + skillId);
+            return skillRepository.save(skill);
         }
     }
 

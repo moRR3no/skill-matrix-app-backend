@@ -32,8 +32,9 @@ public class ProjectService {
         Optional<Project> existingProject = projectRepository.findByName(projectName);
         if (existingProject.isPresent()) {
             throw new AlreadyExistsException("Project with name " + projectName + " already exists.");
+        } else {
+            return projectRepository.save(project);
         }
-        return projectRepository.save(project);
     }
 
     public void deleteById(UUID id) {

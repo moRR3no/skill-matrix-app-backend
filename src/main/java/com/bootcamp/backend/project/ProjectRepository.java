@@ -10,4 +10,6 @@ import java.util.UUID;
 public interface ProjectRepository extends JpaRepository<Project, UUID> {
 
     Optional<Project> findByName(String name);
+
+    boolean existsByName (String name);
 }

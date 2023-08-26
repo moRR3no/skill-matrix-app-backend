@@ -3,6 +3,7 @@ package com.bootcamp.backend.employee;
 
 import com.bootcamp.backend.project.Project;
 import com.bootcamp.backend.skill.Skill;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -30,10 +31,6 @@ public class Employee {
 
     @Column(name = "date")
     private Date date;
-
-    @ManyToOne
-    @JoinColumn(name = "manager_id")
-    private Employee manager;
 
     @ManyToMany
     List<Skill> skills;

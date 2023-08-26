@@ -1,6 +1,9 @@
 package com.bootcamp.backend.employee;
 
+import com.bootcamp.backend.exceptions.AlreadyExistsException;
 import com.bootcamp.backend.exceptions.NotFoundException;
+import com.bootcamp.backend.exceptions.WrongInputException;
+import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -29,8 +32,19 @@ public class EmployeeService {
         return employeeRepository.save(employee);
     }
 
+    public Employee updateEmployee(Employee updatedEmployee) {
+        if (employeeRepository.existsById(updatedEmployee.getId())) {
+            return employeeRepository.save(updatedEmployee);
+        } else {
+            throw new WrongInputException("Wrong id input");
+        }
+    }
 
     public void deleteById(UUID id) {
-        employeeRepository.deleteById(id);
+        if (employeeRepository.existsById(id)) {
+            employeeRepository.deleteById(id);
+        } else {
+            throw new NotFoundException("Employee not found with id=" + id);
+        }
     }
 }
