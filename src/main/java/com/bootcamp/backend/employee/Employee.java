@@ -40,6 +40,4 @@ public class Employee {
 
     @ManyToMany
     List<Project> projects;
-
-
 }

@@ -21,12 +21,7 @@ public class EmployeeController {
 
     @GetMapping
     public ResponseEntity<List<Employee>> getEmployees() {
-        List<Employee> employees = new ArrayList<>(employeeService.getEmployees());
-        if (employees.isEmpty()) {
-            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-        } else {
-            return new ResponseEntity<>(employees, HttpStatus.OK);
-        }
+        return new ResponseEntity<>(employeeService.getEmployees(), HttpStatus.OK);
     }
 
     @GetMapping("/{employeeId}")
@@ -52,7 +47,7 @@ public class EmployeeController {
             existingEmployee.setFirstName(updatedEmployee.getFirstName());
             existingEmployee.setSurname(updatedEmployee.getSurname());
             existingEmployee.setDate(updatedEmployee.getDate());
-            existingEmployee.setManagerId(updatedEmployee.getManagerId());
+
 
             return new ResponseEntity<>(employeeService.saveEmployee(existingEmployee), HttpStatus.OK);
 

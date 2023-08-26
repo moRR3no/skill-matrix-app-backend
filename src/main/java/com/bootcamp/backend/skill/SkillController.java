@@ -20,12 +20,7 @@ public class SkillController {
 
     @GetMapping
     public ResponseEntity<List<Skill>> getSkills() {
-        List<Skill> skills = new ArrayList<>(skillService.getSkills());
-        if (skills.isEmpty()) {
-            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-        } else {
-            return new ResponseEntity<>(skills, HttpStatus.OK);
-        }
+        return new ResponseEntity<>(skillService.getSkills(), HttpStatus.OK);
     }
 
     @GetMapping("/{skillId}")
@@ -45,14 +40,9 @@ public class SkillController {
 
     @PutMapping("/{skillId}")
     public ResponseEntity<Skill> updateSkill(@PathVariable("skillId") UUID skillId, @RequestBody Skill updatedSkill) {
-        try {
-            Skill existingSkill = skillService.getSkillById(skillId);
-            existingSkill.setName(updatedSkill.getName());
-            return new ResponseEntity<>(skillService.saveSkill(existingSkill), HttpStatus.OK);
-
-        } catch (RuntimeException e) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
+        updatedSkill.setId(skillId);
+        Skill updated = skillService.updateSkill(updatedSkill);
+        return new ResponseEntity<>(updated, HttpStatus.OK);
     }
 
     @DeleteMapping("/{skillId}")

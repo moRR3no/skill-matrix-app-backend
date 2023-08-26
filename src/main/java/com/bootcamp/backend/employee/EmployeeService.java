@@ -1,5 +1,6 @@
 package com.bootcamp.backend.employee;
 
+import com.bootcamp.backend.exceptions.NotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -20,23 +21,16 @@ public class EmployeeService {
     }
 
     public Employee getEmployeeById(UUID id) {
-        Optional<Employee> result = employeeRepository.findById(id);
-        Employee employee = null;
-        if(result.isPresent()) {
-            employee=result.get();
-        } else {
-            throw new RuntimeException("Did not found employee with id=" + id);
-        }
-        return employee;
+        Optional<Employee> employeeResult = employeeRepository.findById(id);
+        return employeeResult.orElseThrow(() -> new NotFoundException("Employee not found with id=" + id));
     }
 
-    public Employee saveEmployee (Employee employee) {
+    public Employee saveEmployee(Employee employee) {
         return employeeRepository.save(employee);
     }
 
-    public void deleteById (UUID id) {
+
+    public void deleteById(UUID id) {
         employeeRepository.deleteById(id);
     }
-
-
 }
