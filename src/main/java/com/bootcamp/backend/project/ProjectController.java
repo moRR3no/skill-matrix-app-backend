@@ -27,12 +27,12 @@ public class ProjectController {
         return new ResponseEntity<>(projectService.getProjectById(projectId), HttpStatus.OK);
     }
 
-    @PostMapping()
+    @PostMapping
     public ResponseEntity<Project> addProject(@RequestBody Project project) {
         return new ResponseEntity<>(projectService.saveProject(project), HttpStatus.CREATED);
     }
 
-    @PutMapping("/{projectId}")
+    @PutMapping
     public ResponseEntity<Project> updateProject(@RequestBody Project updatedProject) {
         return new ResponseEntity<>(projectService.saveProject(updatedProject), HttpStatus.OK);
     }

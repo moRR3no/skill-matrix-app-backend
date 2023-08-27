@@ -27,12 +27,12 @@ public class SkillController {
         return new ResponseEntity<>(skillService.getSkillById(skillId), HttpStatus.OK);
     }
 
-    @PostMapping()
+    @PostMapping
     public ResponseEntity<Skill> addSkill(@RequestBody Skill skill) {
         return new ResponseEntity<>(skillService.saveSkill(skill), HttpStatus.CREATED);
     }
 
-    @PutMapping()
+    @PutMapping
     public ResponseEntity<Skill> updateSkill(@RequestBody Skill updatedSkill) {
         return new ResponseEntity<>(skillService.saveSkill(updatedSkill), HttpStatus.OK);
     }

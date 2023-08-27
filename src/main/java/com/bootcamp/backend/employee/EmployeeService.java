@@ -26,13 +26,27 @@ public class EmployeeService {
         return employeeResult.orElseThrow(() -> new NotFoundException("Employee not found with id=" + id));
     }
 
-    public Employee saveEmployee(Employee employee) {
-        return employeeRepository.save(employee);
+    public Employee saveEmployee(Employee employee) throws NotFoundException{
+        Employee manager = employee.getManager();
+        if (manager == null) {
+            return employeeRepository.save(employee);
+        } else if (employeeRepository.existsById(manager.getId())) {
+            return employeeRepository.save(employee);
+        } else {
+            throw new NotFoundException("Manager not found");
+        }
     }
 
     public Employee updateEmployee(Employee updatedEmployee) {
         if (employeeRepository.existsById(updatedEmployee.getId())) {
-            return employeeRepository.save(updatedEmployee);
+            Employee manager = updatedEmployee.getManager();
+            if (manager == null) {
+                return employeeRepository.save(updatedEmployee);
+            } else if (employeeRepository.existsById(manager.getId())) {
+                return employeeRepository.save(updatedEmployee);
+            } else {
+                throw new NotFoundException("Manager not found");
+            }
         } else {
             throw new WrongInputException("Wrong id input");
         }

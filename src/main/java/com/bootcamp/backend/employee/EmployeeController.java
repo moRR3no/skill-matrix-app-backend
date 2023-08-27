@@ -17,7 +17,7 @@ public class EmployeeController {
         this.employeeService = employeeService;
     }
 
-    @GetMapping()
+    @GetMapping
     public ResponseEntity<List<Employee>> getEmployees() {
         return new ResponseEntity<>(employeeService.getEmployees(), HttpStatus.OK);
     }
@@ -27,12 +27,12 @@ public class EmployeeController {
         return new ResponseEntity<>(employeeService.getEmployeeById(employeeId), HttpStatus.OK);
     }
 
-    @PostMapping()
+    @PostMapping
     public ResponseEntity<Employee> addEmployee(@RequestBody Employee employee) {
         return new ResponseEntity<>(employeeService.saveEmployee(employee), HttpStatus.CREATED);
     }
 
-    @PutMapping()
+    @PutMapping
     public ResponseEntity<Employee> updateEmployee(@RequestBody Employee updatedEmployee) {
         return new ResponseEntity<>(employeeService.updateEmployee(updatedEmployee), HttpStatus.OK);
     }
