@@ -18,23 +18,23 @@ public class SkillController {
     }
 
     @GetMapping
-    public ResponseEntity<List<Skill>> getSkills() {
+    public ResponseEntity<List<SkillDTO>> getSkills() {
         return new ResponseEntity<>(skillService.getSkills(), HttpStatus.OK);
     }
 
     @GetMapping("/{skillId}")
-    public ResponseEntity<Skill> getSkillById(@PathVariable("skillId") UUID skillId) {
+    public ResponseEntity<SkillDTO> getSkillById(@PathVariable("skillId") UUID skillId) {
         return new ResponseEntity<>(skillService.getSkillById(skillId), HttpStatus.OK);
     }
 
     @PostMapping
-    public ResponseEntity<Skill> addSkill(@RequestBody Skill skill) {
-        return new ResponseEntity<>(skillService.saveSkill(skill), HttpStatus.CREATED);
+    public ResponseEntity<SkillDTO> addSkill(@RequestBody SkillDTO skillDTO) {
+        return new ResponseEntity<>(skillService.saveSkill(skillDTO), HttpStatus.CREATED);
     }
 
     @PutMapping
-    public ResponseEntity<Skill> updateSkill(@RequestBody Skill updatedSkill) {
-        return new ResponseEntity<>(skillService.saveSkill(updatedSkill), HttpStatus.OK);
+    public ResponseEntity<SkillDTO> updateSkill(@RequestBody SkillDTO updatedSkillDTO) {
+        return new ResponseEntity<>(skillService.saveSkill(updatedSkillDTO), HttpStatus.OK);
     }
 
     @DeleteMapping("/{skillId}")

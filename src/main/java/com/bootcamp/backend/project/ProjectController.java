@@ -18,23 +18,23 @@ public class ProjectController {
     }
 
     @GetMapping
-    public ResponseEntity<List<Project>> getProjects() {
+    public ResponseEntity<List<ProjectDTO>> getProjects() {
         return new ResponseEntity<>(projectService.getProjects(), HttpStatus.OK);
     }
 
     @GetMapping("/{projectId}")
-    public ResponseEntity<Project> getProjectById(@PathVariable("projectId") UUID projectId) {
+    public ResponseEntity<ProjectDTO> getProjectById(@PathVariable("projectId") UUID projectId) {
         return new ResponseEntity<>(projectService.getProjectById(projectId), HttpStatus.OK);
     }
 
     @PostMapping
-    public ResponseEntity<Project> addProject(@RequestBody Project project) {
-        return new ResponseEntity<>(projectService.saveProject(project), HttpStatus.CREATED);
+    public ResponseEntity<ProjectDTO> addProject(@RequestBody ProjectDTO projectDTO) {
+        return new ResponseEntity<>(projectService.saveProject(projectDTO), HttpStatus.CREATED);
     }
 
     @PutMapping
-    public ResponseEntity<Project> updateProject(@RequestBody Project updatedProject) {
-        return new ResponseEntity<>(projectService.saveProject(updatedProject), HttpStatus.OK);
+    public ResponseEntity<ProjectDTO> updateProject(@RequestBody ProjectDTO updatedProjectDTO) {
+        return new ResponseEntity<>(projectService.saveProject(updatedProjectDTO), HttpStatus.OK);
     }
 
     @DeleteMapping("/{projectId}")
