@@ -18,12 +18,12 @@ public class EmployeeController {
     }
 
     @GetMapping
-    public ResponseEntity<List<Employee>> getEmployees() {
+    public ResponseEntity<List<EmployeeDTO>> getEmployees() {
         return new ResponseEntity<>(employeeService.getEmployees(), HttpStatus.OK);
     }
 
     @GetMapping("/{employeeId}")
-    public ResponseEntity<Employee> getEmployeeById(@PathVariable("employeeId") UUID employeeId) {
+    public ResponseEntity<EmployeeDTO> getEmployeeById(@PathVariable("employeeId") UUID employeeId) {
         return new ResponseEntity<>(employeeService.getEmployeeById(employeeId), HttpStatus.OK);
     }
 
