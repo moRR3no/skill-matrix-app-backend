@@ -22,34 +22,21 @@ public class EmployeeService {
     }
 
     public Employee getEmployeeById(UUID id) {
-        Optional<Employee> employeeResult = employeeRepository.findById(id);
-        return employeeResult.orElseThrow(() -> new NotFoundException("Employee not found with id=" + id));
+        return employeeRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Employee not found with id=" + id));
     }
 
-    public Employee saveEmployee(Employee employee) throws NotFoundException{
-        Employee manager = employee.getManager();
-        if (manager == null) {
-            return employeeRepository.save(employee);
-        } else if (employeeRepository.existsById(manager.getId())) {
-            return employeeRepository.save(employee);
-        } else {
-            throw new NotFoundException("Manager not found");
-        }
+    public Employee saveEmployee(Employee employee) {
+        validateManager(employee);
+        return employeeRepository.save(employee);
     }
 
     public Employee updateEmployee(Employee updatedEmployee) {
-        if (employeeRepository.existsById(updatedEmployee.getId())) {
-            Employee manager = updatedEmployee.getManager();
-            if (manager == null) {
-                return employeeRepository.save(updatedEmployee);
-            } else if (employeeRepository.existsById(manager.getId())) {
-                return employeeRepository.save(updatedEmployee);
-            } else {
-                throw new NotFoundException("Manager not found");
-            }
-        } else {
+        if (!employeeRepository.existsById(updatedEmployee.getId())) {
             throw new WrongInputException("Wrong id input");
         }
+        validateManager(updatedEmployee);
+        return employeeRepository.save(updatedEmployee);
     }
 
     public void deleteById(UUID id) {
@@ -57,6 +44,13 @@ public class EmployeeService {
             employeeRepository.deleteById(id);
         } else {
             throw new NotFoundException("Employee not found with id=" + id);
+        }
+    }
+
+    private void validateManager(Employee employee) {
+        Employee manager = employee.getManager();
+        if (manager != null && !employeeRepository.existsById(manager.getId())) {
+            throw new NotFoundException("Manager not found");
         }
     }
 }
