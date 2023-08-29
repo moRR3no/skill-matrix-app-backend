@@ -32,9 +32,10 @@ public class EmployeeController {
         return new ResponseEntity<>(employeeService.saveEmployee(employee), HttpStatus.CREATED);
     }
 
-    @PutMapping
-    public ResponseEntity<Employee> updateEmployee(@RequestBody Employee updatedEmployee) {
-        return new ResponseEntity<>(employeeService.updateEmployee(updatedEmployee), HttpStatus.OK);
+    @PutMapping("/{employeeId}")
+    public ResponseEntity<Employee> updateEmployee(@PathVariable("employeeId") UUID id,
+                                                   @RequestBody Employee updatedEmployee) {
+        return new ResponseEntity<>(employeeService.updateEmployee(id, updatedEmployee), HttpStatus.OK);
     }
 
     @DeleteMapping("/{employeeId}")

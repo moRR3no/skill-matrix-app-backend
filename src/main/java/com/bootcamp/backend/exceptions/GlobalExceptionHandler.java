@@ -12,8 +12,10 @@ import java.time.LocalDateTime;
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(NotFoundException.class)
-    public ResponseEntity<ApiError> handleException(NotFoundException e,
-                                                    HttpServletRequest request) {
+    public ResponseEntity<ApiError> handleException(
+            NotFoundException e,
+            HttpServletRequest request) {
+
         ApiError apiError = new ApiError(
                 request.getRequestURI(),
                 e.getMessage(),
@@ -27,18 +29,29 @@ public class GlobalExceptionHandler {
             WrongInputException.class,
             AlreadyExistsException.class})
     public ResponseEntity<ApiError> handleException(
-            WrongInputException e1,
-            AlreadyExistsException e2,
+            RuntimeException e,
             HttpServletRequest request) {
-
-        String errorMessage = (e1 != null) ? e1.getMessage() : e2.getMessage();
 
         ApiError apiError = new ApiError(
                 request.getRequestURI(),
-                errorMessage,
+                e.getMessage(),
                 HttpStatus.BAD_REQUEST.value(),
                 LocalDateTime.now()
         );
         return new ResponseEntity<>(apiError, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler({Exception.class})
+    public ResponseEntity<ApiError> handleException(
+            Exception e,
+            HttpServletRequest request) {
+
+        ApiError apiError = new ApiError(
+                request.getRequestURI(),
+                e.getMessage(),
+                HttpStatus.INTERNAL_SERVER_ERROR.value(),
+                LocalDateTime.now()
+        );
+        return new ResponseEntity<>(apiError, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }

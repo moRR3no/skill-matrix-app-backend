@@ -35,12 +35,14 @@ public class EmployeeService {
         return employeeRepository.save(employee);
     }
 
-    public Employee updateEmployee(Employee updatedEmployee) {
-        if (!employeeRepository.existsById(updatedEmployee.getId())) {
+    public Employee updateEmployee(UUID pathId, Employee updatedEmployee) {
+        UUID employeeId = updatedEmployee.getId();
+        if (employeeRepository.existsById(employeeId) && pathId.equals(employeeId)) {
+            validateManager(updatedEmployee);
+            return employeeRepository.save(updatedEmployee);
+        } else {
             throw new WrongInputException("Wrong id input");
         }
-        validateManager(updatedEmployee);
-        return employeeRepository.save(updatedEmployee);
     }
 
     public void deleteById(UUID id) {
