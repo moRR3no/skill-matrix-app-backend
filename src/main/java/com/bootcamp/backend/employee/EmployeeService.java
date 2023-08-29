@@ -5,7 +5,6 @@ import com.bootcamp.backend.exceptions.WrongInputException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -30,16 +29,20 @@ public class EmployeeService {
         return employeeMapper.employeeToEmployeeDTO(employee);
     }
 
-    public Employee saveEmployee(Employee employee) {
+    public EmployeeDTO saveEmployee(EmployeeDTO employeeDTO) {
+        Employee employee = employeeMapper.employeeDTOToEmployee(employeeDTO);
         validateManager(employee);
-        return employeeRepository.save(employee);
+        Employee savedEmployee = employeeRepository.save(employee);
+        return employeeMapper.employeeToEmployeeDTO(savedEmployee);
     }
 
-    public Employee updateEmployee(UUID pathId, Employee updatedEmployee) {
-        UUID employeeId = updatedEmployee.getId();
+    public EmployeeDTO updateEmployee(UUID pathId, EmployeeDTO updatedEmployeeDTO) {
+        Employee employee = employeeMapper.employeeDTOToEmployee(updatedEmployeeDTO);
+        UUID employeeId = employee.getId();
         if (employeeRepository.existsById(employeeId) && pathId.equals(employeeId)) {
-            validateManager(updatedEmployee);
-            return employeeRepository.save(updatedEmployee);
+            validateManager(employee);
+            employeeRepository.save(employee);
+            return employeeMapper.employeeToEmployeeDTO(employee);
         } else {
             throw new WrongInputException("Wrong id input");
         }

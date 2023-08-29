@@ -28,14 +28,14 @@ public class EmployeeController {
     }
 
     @PostMapping
-    public ResponseEntity<Employee> addEmployee(@RequestBody Employee employee) {
-        return new ResponseEntity<>(employeeService.saveEmployee(employee), HttpStatus.CREATED);
+    public ResponseEntity<EmployeeDTO> addEmployee(@RequestBody EmployeeDTO employeeDTO) {
+        return new ResponseEntity<>(employeeService.saveEmployee(employeeDTO), HttpStatus.CREATED);
     }
 
     @PutMapping("/{employeeId}")
-    public ResponseEntity<Employee> updateEmployee(@PathVariable("employeeId") UUID id,
-                                                   @RequestBody Employee updatedEmployee) {
-        return new ResponseEntity<>(employeeService.updateEmployee(id, updatedEmployee), HttpStatus.OK);
+    public ResponseEntity<EmployeeDTO> updateEmployee(@PathVariable("employeeId") UUID id,
+                                                   @RequestBody EmployeeDTO updatedEmployeeDTO) {
+        return new ResponseEntity<>(employeeService.updateEmployee(id, updatedEmployeeDTO), HttpStatus.OK);
     }
 
     @DeleteMapping("/{employeeId}")
