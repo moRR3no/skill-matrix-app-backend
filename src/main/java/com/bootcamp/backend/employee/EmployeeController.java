@@ -1,5 +1,6 @@
 package com.bootcamp.backend.employee;
 
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -28,13 +29,13 @@ public class EmployeeController {
     }
 
     @PostMapping
-    public ResponseEntity<EmployeeDTO> addEmployee(@RequestBody EmployeeDTO employeeDTO) {
+    public ResponseEntity<EmployeeDTO> addEmployee(@Valid @RequestBody EmployeeDTO employeeDTO) {
         return new ResponseEntity<>(employeeService.saveEmployee(employeeDTO), HttpStatus.CREATED);
     }
 
     @PutMapping("/{employeeId}")
     public ResponseEntity<EmployeeDTO> updateEmployee(@PathVariable("employeeId") UUID id,
-                                                   @RequestBody EmployeeDTO updatedEmployeeDTO) {
+                                                      @Valid @RequestBody EmployeeDTO updatedEmployeeDTO) {
         return new ResponseEntity<>(employeeService.updateEmployee(id, updatedEmployeeDTO), HttpStatus.OK);
     }
 

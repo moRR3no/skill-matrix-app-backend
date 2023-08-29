@@ -1,6 +1,7 @@
 package com.bootcamp.backend.project;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
@@ -21,5 +22,6 @@ public class Project {
     private UUID id;
 
     @Column(name = "name")
+    @NotBlank
     private String name;
 }

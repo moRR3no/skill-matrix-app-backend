@@ -1,5 +1,6 @@
 package com.bootcamp.backend.skill;
 
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -28,12 +29,12 @@ public class SkillController {
     }
 
     @PostMapping
-    public ResponseEntity<SkillDTO> addSkill(@RequestBody SkillDTO skillDTO) {
+    public ResponseEntity<SkillDTO> addSkill(@Valid @RequestBody SkillDTO skillDTO) {
         return new ResponseEntity<>(skillService.saveSkill(skillDTO), HttpStatus.CREATED);
     }
 
     @PutMapping
-    public ResponseEntity<SkillDTO> updateSkill(@RequestBody SkillDTO updatedSkillDTO) {
+    public ResponseEntity<SkillDTO> updateSkill(@Valid @RequestBody SkillDTO updatedSkillDTO) {
         return new ResponseEntity<>(skillService.saveSkill(updatedSkillDTO), HttpStatus.OK);
     }
 

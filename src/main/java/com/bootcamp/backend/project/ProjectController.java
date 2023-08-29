@@ -1,5 +1,6 @@
 package com.bootcamp.backend.project;
 
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -28,12 +29,12 @@ public class ProjectController {
     }
 
     @PostMapping
-    public ResponseEntity<ProjectDTO> addProject(@RequestBody ProjectDTO projectDTO) {
+    public ResponseEntity<ProjectDTO> addProject(@Valid @RequestBody ProjectDTO projectDTO) {
         return new ResponseEntity<>(projectService.saveProject(projectDTO), HttpStatus.CREATED);
     }
 
     @PutMapping
-    public ResponseEntity<ProjectDTO> updateProject(@RequestBody ProjectDTO updatedProjectDTO) {
+    public ResponseEntity<ProjectDTO> updateProject(@Valid @RequestBody ProjectDTO updatedProjectDTO) {
         return new ResponseEntity<>(projectService.saveProject(updatedProjectDTO), HttpStatus.OK);
     }
 
