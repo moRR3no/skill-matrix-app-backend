@@ -2,7 +2,6 @@ package com.bootcamp.backend.employee;
 
 import com.bootcamp.backend.exceptions.NotFoundException;
 import com.bootcamp.backend.exceptions.WrongInputException;
-import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -30,21 +29,17 @@ public class EmployeeService {
         return employeeMapper.employeeToEmployeeDTO(employee);
     }
 
-    @Transactional
     public EmployeeDTO saveEmployee(EmployeeDTO employeeDTO) {
         Employee employee = employeeMapper.employeeDTOToEmployee(employeeDTO);
-//        validateManager(employee);
         setManagerFromDTO(employeeDTO, employee);
         Employee savedEmployee = employeeRepository.save(employee);
         return employeeMapper.employeeToEmployeeDTO(savedEmployee);
     }
 
-    @Transactional
     public EmployeeDTO updateEmployee(UUID pathId, EmployeeDTO employeeDTO) {
         UUID employeeId = employeeDTO.getId();
         if (employeeRepository.existsById(employeeId) && pathId.equals(employeeId)) {
             Employee employee = employeeMapper.employeeDTOToEmployee(employeeDTO);
-//            validateManager(employee);
             setManagerFromDTO(employeeDTO, employee);
             Employee updatedEmployee = employeeRepository.save(employee);
             return employeeMapper.employeeToEmployeeDTO(updatedEmployee);
@@ -53,20 +48,12 @@ public class EmployeeService {
         }
     }
 
-    @Transactional
     public void deleteById(UUID id) {
         if (employeeRepository.existsById(id)) {
             setManagerToNull(id);
             employeeRepository.deleteById(id);
         } else {
             throw new NotFoundException("Employee not found with id=" + id);
-        }
-    }
-
-    private void validateManager(Employee employee) {
-        Employee manager = employee.getManager();
-        if (manager != null && !employeeRepository.existsById(manager.getId())) {
-            throw new NotFoundException("Manager not found");
         }
     }
 

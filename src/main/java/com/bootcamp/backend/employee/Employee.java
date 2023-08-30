@@ -36,6 +36,7 @@ public class Employee {
     private String surname;
 
     @Column(name = "date")
+    @NotBlank
     private LocalDate date;
 
     @ManyToOne
