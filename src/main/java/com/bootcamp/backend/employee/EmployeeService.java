@@ -2,6 +2,7 @@ package com.bootcamp.backend.employee;
 
 import com.bootcamp.backend.exceptions.NotFoundException;
 import com.bootcamp.backend.exceptions.WrongInputException;
+import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -29,27 +30,33 @@ public class EmployeeService {
         return employeeMapper.employeeToEmployeeDTO(employee);
     }
 
+    @Transactional
     public EmployeeDTO saveEmployee(EmployeeDTO employeeDTO) {
         Employee employee = employeeMapper.employeeDTOToEmployee(employeeDTO);
-        validateManager(employee);
+//        validateManager(employee);
+        setManagerFromDTO(employeeDTO, employee);
         Employee savedEmployee = employeeRepository.save(employee);
         return employeeMapper.employeeToEmployeeDTO(savedEmployee);
     }
 
-    public EmployeeDTO updateEmployee(UUID pathId, EmployeeDTO updatedEmployeeDTO) {
-        Employee employee = employeeMapper.employeeDTOToEmployee(updatedEmployeeDTO);
-        UUID employeeId = employee.getId();
+    @Transactional
+    public EmployeeDTO updateEmployee(UUID pathId, EmployeeDTO employeeDTO) {
+        UUID employeeId = employeeDTO.getId();
         if (employeeRepository.existsById(employeeId) && pathId.equals(employeeId)) {
-            validateManager(employee);
-            employeeRepository.save(employee);
-            return employeeMapper.employeeToEmployeeDTO(employee);
+            Employee employee = employeeMapper.employeeDTOToEmployee(employeeDTO);
+//            validateManager(employee);
+            setManagerFromDTO(employeeDTO, employee);
+            Employee updatedEmployee = employeeRepository.save(employee);
+            return employeeMapper.employeeToEmployeeDTO(updatedEmployee);
         } else {
             throw new WrongInputException("Wrong id input");
         }
     }
 
+    @Transactional
     public void deleteById(UUID id) {
         if (employeeRepository.existsById(id)) {
+            setManagerToNull(id);
             employeeRepository.deleteById(id);
         } else {
             throw new NotFoundException("Employee not found with id=" + id);
@@ -60,6 +67,27 @@ public class EmployeeService {
         Employee manager = employee.getManager();
         if (manager != null && !employeeRepository.existsById(manager.getId())) {
             throw new NotFoundException("Manager not found");
+        }
+    }
+
+    public Employee getManagerById (UUID managerId) {
+        return employeeRepository.findById(managerId)
+                .orElseThrow(() -> new NotFoundException("Manager not found with id=" + managerId));
+    }
+
+    public void setManagerFromDTO (EmployeeDTO employeeDTO, Employee employee) {
+        if(employeeDTO.getManagerId() != null) {
+            Employee manager = getManagerById(employeeDTO.getManagerId());
+            employee.setManager(manager);
+        }
+    }
+
+    public void setManagerToNull (UUID id) {
+        List<Employee> employees = employeeRepository.findAll();
+        for (Employee emp : employees) {
+            if (emp.getManager() != null && emp.getManager().getId().equals(id)) {
+                emp.setManager(null);
+            }
         }
     }
 }

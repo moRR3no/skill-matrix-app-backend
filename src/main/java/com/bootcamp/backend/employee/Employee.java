@@ -7,6 +7,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
 import lombok.*;
 
 import java.time.LocalDate;
@@ -28,16 +29,13 @@ public class Employee {
 
     @Column(name = "first_name")
     @NotBlank
-    @Min(2)
     private String firstName;
 
     @Column(name = "surname")
     @NotBlank
-    @Min(2)
     private String surname;
 
     @Column(name = "date")
-    @NotBlank
     private LocalDate date;
 
     @ManyToOne

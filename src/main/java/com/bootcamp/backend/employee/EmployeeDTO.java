@@ -3,6 +3,7 @@ package com.bootcamp.backend.employee;
 import com.bootcamp.backend.project.Project;
 import com.bootcamp.backend.skill.Skill;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.Setter;
 
