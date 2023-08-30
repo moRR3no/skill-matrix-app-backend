@@ -3,15 +3,11 @@ package com.bootcamp.backend.employee;
 
 import com.bootcamp.backend.project.Project;
 import com.bootcamp.backend.skill.Skill;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotEmpty;
 import lombok.*;
 
 import java.time.LocalDate;
-import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
