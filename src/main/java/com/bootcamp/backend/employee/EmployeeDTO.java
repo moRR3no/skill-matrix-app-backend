@@ -6,7 +6,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.Date;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 
@@ -24,7 +24,7 @@ public class EmployeeDTO {
     private String surname;
 
     @JsonProperty("date")
-    private Date date;
+    private LocalDate date;
 
     @JsonProperty("managerId")
     private UUID managerId;
