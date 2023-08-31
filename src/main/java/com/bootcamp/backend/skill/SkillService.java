@@ -2,6 +2,7 @@ package com.bootcamp.backend.skill;
 
 import com.bootcamp.backend.exceptions.AlreadyExistsException;
 import com.bootcamp.backend.exceptions.NotFoundException;
+import com.bootcamp.backend.mappers.MapStructMapper;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -12,22 +13,22 @@ import java.util.UUID;
 public class SkillService {
 
     private final SkillRepository skillRepository;
-    private final SkillMapper skillMapper;
+    private final MapStructMapper mapstructMapper;
 
-    public SkillService(SkillRepository skillRepository, SkillMapper skillMapper) {
+    public SkillService(SkillRepository skillRepository, MapStructMapper mapstructMapper) {
         this.skillRepository = skillRepository;
-        this.skillMapper = skillMapper;
+        this.mapstructMapper = mapstructMapper;
     }
 
     public List<SkillDTO> getSkills() {
         List<Skill> skills = skillRepository.findAll();
-        return skillMapper.skillsToSkillDTOs(skills);
+        return mapstructMapper.skillsToSkillDTOs(skills);
     }
 
     public SkillDTO getSkillById(UUID id) {
         Skill skill = skillRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Skill not found with id=" + id));
-        return skillMapper.skillToSkillDTO(skill);
+        return mapstructMapper.skillToSkillDTO(skill);
     }
 
     public SkillDTO saveSkill(SkillDTO skillDTO) {
@@ -35,9 +36,9 @@ public class SkillService {
         if (skillRepository.existsByName(skillName)) {
             throw new AlreadyExistsException("Skill with name " + skillName + " already exists.");
         }
-        Skill skill = skillMapper.skillDTOToSkill(skillDTO);
+        Skill skill = mapstructMapper.skillDTOToSkill(skillDTO);
         Skill savedSkill = skillRepository.save(skill);
-        return skillMapper.skillToSkillDTO(savedSkill);
+        return mapstructMapper.skillToSkillDTO(savedSkill);
     }
 
     public void deleteById(UUID id) {

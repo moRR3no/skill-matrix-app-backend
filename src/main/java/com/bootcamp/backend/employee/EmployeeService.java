@@ -2,6 +2,7 @@ package com.bootcamp.backend.employee;
 
 import com.bootcamp.backend.exceptions.NotFoundException;
 import com.bootcamp.backend.exceptions.WrongInputException;
+import com.bootcamp.backend.mappers.MapStructMapper;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -11,38 +12,38 @@ import java.util.UUID;
 public class EmployeeService {
 
     private final EmployeeRepository employeeRepository;
-    private final EmployeeMapper employeeMapper;
+    private final MapStructMapper mapstructMapper;
 
-    public EmployeeService(EmployeeRepository employeeRepository, EmployeeMapper employeeMapper) {
+    public EmployeeService(EmployeeRepository employeeRepository, MapStructMapper mapstructMapper) {
         this.employeeRepository = employeeRepository;
-        this.employeeMapper = employeeMapper;
+        this.mapstructMapper = mapstructMapper;
     }
 
     public List<EmployeeDTO> getEmployees() {
         List<Employee> employees = employeeRepository.findAll();
-        return employeeMapper.employeesToEmployeeDTOs(employees);
+        return mapstructMapper.employeesToEmployeeDTOs(employees);
     }
 
     public EmployeeDTO getEmployeeById(UUID id) {
         Employee employee = employeeRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Employee not found with id=" + id));
-        return employeeMapper.employeeToEmployeeDTO(employee);
+        return mapstructMapper.employeeToEmployeeDTO(employee);
     }
 
     public EmployeeDTO saveEmployee(EmployeeDTO employeeDTO) {
-        Employee employee = employeeMapper.employeeDTOToEmployee(employeeDTO);
+        Employee employee = mapstructMapper.employeeDTOToEmployee(employeeDTO);
         setManagerFromDTO(employeeDTO, employee);
         Employee savedEmployee = employeeRepository.save(employee);
-        return employeeMapper.employeeToEmployeeDTO(savedEmployee);
+        return mapstructMapper.employeeToEmployeeDTO(savedEmployee);
     }
 
     public EmployeeDTO updateEmployee(UUID pathId, EmployeeDTO employeeDTO) {
         UUID employeeId = employeeDTO.getId();
         if (employeeRepository.existsById(employeeId) && pathId.equals(employeeId)) {
-            Employee employee = employeeMapper.employeeDTOToEmployee(employeeDTO);
+            Employee employee = mapstructMapper.employeeDTOToEmployee(employeeDTO);
             setManagerFromDTO(employeeDTO, employee);
             Employee updatedEmployee = employeeRepository.save(employee);
-            return employeeMapper.employeeToEmployeeDTO(updatedEmployee);
+            return mapstructMapper.employeeToEmployeeDTO(updatedEmployee);
         } else {
             throw new WrongInputException("Wrong id input");
         }
@@ -57,19 +58,19 @@ public class EmployeeService {
         }
     }
 
-    public Employee getManagerById (UUID managerId) {
+    private Employee getManagerById (UUID managerId) {
         return employeeRepository.findById(managerId)
                 .orElseThrow(() -> new NotFoundException("Manager not found with id=" + managerId));
     }
 
-    public void setManagerFromDTO (EmployeeDTO employeeDTO, Employee employee) {
+    private void setManagerFromDTO (EmployeeDTO employeeDTO, Employee employee) {
         if(employeeDTO.getManagerId() != null) {
             Employee manager = getManagerById(employeeDTO.getManagerId());
             employee.setManager(manager);
         }
     }
 
-    public void setManagerToNull (UUID id) {
+    private void setManagerToNull (UUID id) {
         List<Employee> employees = employeeRepository.findAll();
         for (Employee emp : employees) {
             if (emp.getManager() != null && emp.getManager().getId().equals(id)) {

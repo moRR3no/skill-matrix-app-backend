@@ -1,7 +1,9 @@
 package com.bootcamp.backend.employee;
 
 import com.bootcamp.backend.project.Project;
+import com.bootcamp.backend.project.ProjectDTO;
 import com.bootcamp.backend.skill.Skill;
+import com.bootcamp.backend.skill.SkillDTO;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.Setter;
@@ -30,8 +32,8 @@ public class EmployeeDTO {
     private UUID managerId;
 
     @JsonProperty("skills")
-    List<Skill> skills;
+    List<SkillDTO> skills;
 
     @JsonProperty("projects")
-    List<Project> projects;
+    List<ProjectDTO> projects;
 }

@@ -5,6 +5,7 @@ import com.bootcamp.backend.project.Project;
 import com.bootcamp.backend.skill.Skill;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 import java.time.LocalDate;
@@ -32,7 +33,7 @@ public class Employee {
     private String surname;
 
     @Column(name = "date")
-    @NotBlank
+    @NotNull
     private LocalDate date;
 
     @ManyToOne
