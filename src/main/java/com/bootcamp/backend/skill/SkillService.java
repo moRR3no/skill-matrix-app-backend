@@ -2,6 +2,7 @@ package com.bootcamp.backend.skill;
 
 import com.bootcamp.backend.exceptions.AlreadyExistsException;
 import com.bootcamp.backend.exceptions.NotFoundException;
+import com.bootcamp.backend.mappers.MapStructMapper;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -12,27 +13,32 @@ import java.util.UUID;
 public class SkillService {
 
     private final SkillRepository skillRepository;
+    private final MapStructMapper mapstructMapper;
 
-    public SkillService(SkillRepository skillRepository) {
+    public SkillService(SkillRepository skillRepository, MapStructMapper mapstructMapper) {
         this.skillRepository = skillRepository;
+        this.mapstructMapper = mapstructMapper;
     }
 
-    public List<Skill> getSkills() {
-        return skillRepository.findAll();
+    public List<SkillDTO> getSkills() {
+        List<Skill> skills = skillRepository.findAll();
+        return mapstructMapper.skillsToSkillDTOs(skills);
     }
 
-    public Skill getSkillById(UUID id) {
-        Optional<Skill> skillResult = skillRepository.findById(id);
-        return skillResult.orElseThrow(() -> new NotFoundException("Skill not found with id=" + id));
+    public SkillDTO getSkillById(UUID id) {
+        Skill skill = skillRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Skill not found with id=" + id));
+        return mapstructMapper.skillToSkillDTO(skill);
     }
 
-    public Skill saveSkill(Skill skill) {
-        String skillName = skill.getName();
+    public SkillDTO saveSkill(SkillDTO skillDTO) {
+        String skillName = skillDTO.getName();
         if (skillRepository.existsByName(skillName)) {
             throw new AlreadyExistsException("Skill with name " + skillName + " already exists.");
-        } else {
-            return skillRepository.save(skill);
         }
+        Skill skill = mapstructMapper.skillDTOToSkill(skillDTO);
+        Skill savedSkill = skillRepository.save(skill);
+        return mapstructMapper.skillToSkillDTO(savedSkill);
     }
 
     public void deleteById(UUID id) {
