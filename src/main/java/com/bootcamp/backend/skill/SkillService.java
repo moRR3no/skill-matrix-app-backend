@@ -33,7 +33,7 @@ public class SkillService {
 
     public SkillDTO saveSkill(SkillDTO skillDTO) {
         String skillName = skillDTO.getName();
-        if (skillRepository.existsByName(skillName)) {
+        if (skillRepository.findByName(skillName).isPresent()) {
             throw new AlreadyExistsException("Skill with name " + skillName + " already exists.");
         }
         Skill skill = mapstructMapper.skillDTOToSkill(skillDTO);
@@ -42,8 +42,7 @@ public class SkillService {
     }
 
     public void deleteById(UUID id) {
-        Optional<Skill> skillToDelete = skillRepository.findById(id);
-        if (skillToDelete.isPresent()) {
+        if (skillRepository.existsById(id)) {
             skillRepository.deleteById(id);
         } else {
             throw new NotFoundException("Skill not found with id=" + id);
