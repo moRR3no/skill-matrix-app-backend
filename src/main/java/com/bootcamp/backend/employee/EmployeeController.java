@@ -10,7 +10,7 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/v1/employees")
-@CrossOrigin
+@CrossOrigin(origins = {"*"})
 public class EmployeeController {
 
     private final EmployeeService employeeService;
@@ -20,8 +20,11 @@ public class EmployeeController {
     }
 
     @GetMapping
-    public ResponseEntity<List<EmployeeDTO>> getEmployees() {
-        return new ResponseEntity<>(employeeService.getEmployees(), HttpStatus.OK);
+    public ResponseEntity<List<EmployeeDTO>> getEmployees(@RequestParam(required = false) String firstName) {
+        if (firstName == null) {
+            return new ResponseEntity<>(employeeService.getEmployees(), HttpStatus.OK);
+        }
+        return new ResponseEntity<>(employeeService.getEmployeeByName(firstName), HttpStatus.OK);
     }
 
     @GetMapping("/{employeeId}")
