@@ -43,6 +43,11 @@ public class EmployeeService {
         return mapstructMapper.employeeToEmployeeDTO(employee);
     }
 
+    public List<EmployeeDTO> getEmployeesByContainingWord (String word) {
+        List<Employee> employee = employeeRepository.findByFirstNameOrSurname(word);
+        return mapstructMapper.employeesToEmployeeDTOs(employee);
+    }
+
     public EmployeeDTO saveEmployee(EmployeeDTO employeeDTO) {
         Employee employee = mapstructMapper.employeeDTOToEmployee(employeeDTO);
         setManagerFromDTO(employeeDTO, employee);

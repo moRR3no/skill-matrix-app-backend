@@ -24,7 +24,7 @@ public class EmployeeController {
         if (firstName == null) {
             return new ResponseEntity<>(employeeService.getEmployees(), HttpStatus.OK);
         } else {
-            return new ResponseEntity<>(employeeService.getEmployeeByName(firstName), HttpStatus.OK);
+            return new ResponseEntity<>(employeeService.getEmployeesByContainingWord(firstName), HttpStatus.OK);
         }
     }
 

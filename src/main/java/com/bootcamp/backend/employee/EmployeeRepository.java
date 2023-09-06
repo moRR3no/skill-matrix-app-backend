@@ -1,6 +1,8 @@
 package com.bootcamp.backend.employee;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -13,4 +15,8 @@ public interface EmployeeRepository extends JpaRepository<Employee, UUID> {
     Optional<Employee> findUserByUsername (String username);
 
     List<Employee> findByFirstName (String name);
+
+    @Query("SELECT e FROM Employee e WHERE e.firstName LIKE %:name% OR e.surname LIKE %:name%")
+    List<Employee> findByFirstNameOrSurname(@Param("name") String name);
+
 }
