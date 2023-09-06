@@ -32,6 +32,11 @@ public class EmployeeService {
         return mapstructMapper.employeesToEmployeeDTOs(employees);
     }
 
+    public List<EmployeeDTO> getEmployeeByName (String name) {
+        List<Employee> employee = employeeRepository.findByFirstName(name);
+        return mapstructMapper.employeesToEmployeeDTOs(employee);
+    }
+
     public EmployeeDTO getEmployeeById(UUID id) {
         Employee employee = employeeRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Employee not found with id=" + id));
