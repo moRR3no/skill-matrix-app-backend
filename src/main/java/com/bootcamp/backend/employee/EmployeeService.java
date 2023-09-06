@@ -1,11 +1,17 @@
 package com.bootcamp.backend.employee;
 
+import com.bootcamp.backend.auth.AuthResponse;
+import com.bootcamp.backend.auth.AuthenticatorRequest;
 import com.bootcamp.backend.exceptions.NotFoundException;
 import com.bootcamp.backend.exceptions.WrongInputException;
 import com.bootcamp.backend.mappers.MapStructMapper;
+import org.springframework.http.HttpStatusCode;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -13,10 +19,12 @@ public class EmployeeService {
 
     private final EmployeeRepository employeeRepository;
     private final MapStructMapper mapstructMapper;
+    private final PasswordEncoder passwordEncoder;
 
-    public EmployeeService(EmployeeRepository employeeRepository, MapStructMapper mapstructMapper) {
+    public EmployeeService(EmployeeRepository employeeRepository, MapStructMapper mapstructMapper, PasswordEncoder passwordEncoder) {
         this.employeeRepository = employeeRepository;
         this.mapstructMapper = mapstructMapper;
+        this.passwordEncoder = passwordEncoder;
     }
 
     public List<EmployeeDTO> getEmployees() {
@@ -77,5 +85,14 @@ public class EmployeeService {
                 emp.setManager(null);
             }
         }
+    }
+
+    public AuthResponse login (AuthenticatorRequest authenticatorRequest) {
+        Optional<Employee> response = this.employeeRepository.findUserByUsername(
+                authenticatorRequest.username());
+        if (response.isPresent() && passwordEncoder.matches(authenticatorRequest.password(), response.get().getPassword())) {
+            return new AuthResponse(authenticatorRequest.username());
+        }
+        throw new ResponseStatusException(HttpStatusCode.valueOf(401));
     }
 }
