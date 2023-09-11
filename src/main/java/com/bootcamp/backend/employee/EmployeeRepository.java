@@ -14,8 +14,6 @@ public interface EmployeeRepository extends JpaRepository<Employee, UUID> {
 
     Optional<Employee> findUserByUsername (String username);
 
-    List<Employee> findByFirstName (String name);
-
     @Query("SELECT e FROM Employee e WHERE e.firstName LIKE %:name% OR e.surname LIKE %:name%")
     List<Employee> findByFirstNameOrSurname(@Param("name") String name);
 

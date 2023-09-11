@@ -46,11 +46,12 @@ public class Employee implements UserDetails {
     @JoinColumn(name = "manager_id")
     private Employee manager;
 
+    //TODO: Validation required to skills and projects
     @ManyToMany
-    List<Skill> skills;
+    private List<Skill> skills;
 
     @ManyToMany
-    List<Project> projects;
+    private List<Project> projects;
 
     private String username;
 

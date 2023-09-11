@@ -28,6 +28,12 @@ public class EmployeeController {
         }
     }
 
+    @GetMapping("/employeeOfTheMonth")
+    public ResponseEntity<EmployeeDTO> getEmployeeOfTheMonth() throws Exception {
+        return new ResponseEntity<>(employeeService.getEmployeeOfTheMonth(), HttpStatus.OK);
+    }
+
+
     @GetMapping("/{employeeId}")
     public ResponseEntity<EmployeeDTO> getEmployeeById(@PathVariable("employeeId") UUID employeeId) {
         return new ResponseEntity<>(employeeService.getEmployeeById(employeeId), HttpStatus.OK);

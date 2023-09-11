@@ -10,9 +10,12 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 public class EmployeeService {
@@ -32,18 +35,13 @@ public class EmployeeService {
         return mapstructMapper.employeesToEmployeeDTOs(employees);
     }
 
-    public List<EmployeeDTO> getEmployeeByName (String name) {
-        List<Employee> employee = employeeRepository.findByFirstName(name);
-        return mapstructMapper.employeesToEmployeeDTOs(employee);
-    }
-
     public EmployeeDTO getEmployeeById(UUID id) {
         Employee employee = employeeRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Employee not found with id=" + id));
         return mapstructMapper.employeeToEmployeeDTO(employee);
     }
 
-    public List<EmployeeDTO> getEmployeesByContainingWord (String word) {
+    public List<EmployeeDTO> getEmployeesByContainingWord(String word) {
         List<Employee> employee = employeeRepository.findByFirstNameOrSurname(word);
         return mapstructMapper.employeesToEmployeeDTOs(employee);
     }
@@ -76,19 +74,19 @@ public class EmployeeService {
         }
     }
 
-    private Employee getManagerById (UUID managerId) {
+    private Employee getManagerById(UUID managerId) {
         return employeeRepository.findById(managerId)
                 .orElseThrow(() -> new NotFoundException("Manager not found with id=" + managerId));
     }
 
-    private void setManagerFromDTO (EmployeeDTO employeeDTO, Employee employee) {
-        if(employeeDTO.getManagerId() != null) {
+    private void setManagerFromDTO(EmployeeDTO employeeDTO, Employee employee) {
+        if (employeeDTO.getManagerId() != null) {
             Employee manager = getManagerById(employeeDTO.getManagerId());
             employee.setManager(manager);
         }
     }
 
-    private void setManagerToNull (UUID id) {
+    private void setManagerToNull(UUID id) {
         List<Employee> employees = employeeRepository.findAll();
         for (Employee emp : employees) {
             if (emp.getManager() != null && emp.getManager().getId().equals(id)) {
@@ -97,7 +95,89 @@ public class EmployeeService {
         }
     }
 
-    public AuthResponse login (AuthenticatorRequest authenticatorRequest) {
+    List<Employee> employeesWithMostProjects() {
+        int maxProjects = -1;
+        List<Employee> employees = employeeRepository.findAll();
+        List<Employee> bestEmployees = new ArrayList<>();
+
+        for (Employee employee : employees) {
+            int numberOfProjects = employee.getProjects().size();
+
+            if (numberOfProjects > maxProjects) {
+                bestEmployees.clear();
+                maxProjects = numberOfProjects;
+                bestEmployees.add(employee);
+            } else if (numberOfProjects == maxProjects) {
+                bestEmployees.add(employee);
+            }
+        }
+        return bestEmployees;
+    }
+
+    List<Employee> employeesWithMostSkills() {
+        if (employeesWithMostProjects().size() == 1) {
+            return employeesWithMostProjects();
+        } else {
+            List<Employee> employees = employeesWithMostProjects();
+            int maxSkills = -1;
+            List<Employee> bestEmployees = new ArrayList<>();
+
+            for (Employee employee : employees) {
+                int numberOfSkills = employee.getSkills().size();
+
+                if (numberOfSkills > maxSkills) {
+                    bestEmployees.clear();
+                    maxSkills = numberOfSkills;
+                    bestEmployees.add(employee);
+                } else if (numberOfSkills == maxSkills) {
+                    bestEmployees.add(employee);
+                }
+            }
+            return bestEmployees;
+        }
+    }
+
+    public List<Employee> getEmployeesWithLatestDate() {
+        if (employeesWithMostSkills().size() == 1) {
+            return employeesWithMostSkills();
+        } else {
+            List<Employee> allEmployees = employeesWithMostSkills();
+            Optional<LocalDate> latestDate = allEmployees.stream()
+                    .map(Employee::getDate)
+                    .max(LocalDate::compareTo);
+
+            if (latestDate.isPresent()) {
+                LocalDate latest = latestDate.get();
+                return allEmployees.stream()
+                        .filter(employee -> employee.getDate().isEqual(latest))
+                        .collect(Collectors.toList());
+            } else {
+                return List.of();
+            }
+        }
+    }
+
+    public EmployeeDTO getEmployeeOfTheMonth() throws Exception {
+        int projectSize = employeesWithMostProjects().size();
+        int skillSize = employeesWithMostSkills().size();
+        UUID id;
+
+        if (employeesWithMostProjects().size() < 1 && employeesWithMostSkills().size() < 1) {
+            throw new Exception("Not enough projects or skills assigned!");
+        }
+
+        if (projectSize < 2) {
+            id = employeesWithMostProjects().get(0).getId();
+        } else if (skillSize < 2) {
+            id = employeesWithMostSkills().get(0).getId();
+        } else {
+            return mapstructMapper.employeeToEmployeeDTO(getEmployeesWithLatestDate().get(0));
+        }
+        return getEmployeeById(id);
+    }
+
+
+    public AuthResponse login(AuthenticatorRequest authenticatorRequest) {
         Optional<Employee> response = this.employeeRepository.findUserByUsername(
                 authenticatorRequest.username());
         if (response.isPresent() && passwordEncoder.matches(authenticatorRequest.password(), response.get().getPassword())) {
