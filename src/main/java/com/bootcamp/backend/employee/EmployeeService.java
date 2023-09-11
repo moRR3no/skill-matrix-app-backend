@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
@@ -95,87 +96,70 @@ public class EmployeeService {
         }
     }
 
-    List<Employee> employeesWithMostProjects() {
-        int maxProjects = -1;
+    public List<Employee> employeesWithMostProjects() {
         List<Employee> employees = employeeRepository.findAll();
+        return findEmployeesWithMost(employees, Employee::getProjects);
+    }
+
+    public List<Employee> employeesWithMostSkills() {
+        List<Employee> employees = employeesWithMostProjects();
+        return findEmployeesWithMost(employees, Employee::getSkills);
+    }
+
+    public List<Employee> getEmployeesWithLatestDate() {
+        List<Employee> employees = employeesWithMostSkills();
+        if (employees.size() == 1) {
+            return employees;
+        } else {
+            LocalDate latestDate = findLatestDate(employees);
+            return employees.stream()
+                    .filter(employee -> employee.getDate().isEqual(latestDate))
+                    .collect(Collectors.toList());
+        }
+    }
+
+    public EmployeeDTO getEmployeeOfTheMonth() throws Exception {
+        List<Employee> projectEmployees = employeesWithMostProjects();
+        List<Employee> skillEmployees = employeesWithMostSkills();
+
+        if (projectEmployees.isEmpty() && skillEmployees.isEmpty()) {
+            throw new Exception("Not enough projects or skills assigned!");
+        }
+
+        if (projectEmployees.size() < 2) {
+            return getEmployeeById(projectEmployees.get(0).getId());
+        } else if (skillEmployees.size() < 2) {
+            return getEmployeeById(skillEmployees.get(0).getId());
+        } else {
+            return mapstructMapper.employeeToEmployeeDTO(getEmployeesWithLatestDate().get(0));
+        }
+    }
+
+    private List<Employee> findEmployeesWithMost(List<Employee> employees, Function<Employee, List<?>> propertyExtractor) {
+        int maxCount = -1;
         List<Employee> bestEmployees = new ArrayList<>();
 
         for (Employee employee : employees) {
-            int numberOfProjects = employee.getProjects().size();
+            List<?> propertyList = propertyExtractor.apply(employee);
+            int propertyCount = propertyList.size();
 
-            if (numberOfProjects > maxProjects) {
+            if (propertyCount > maxCount) {
                 bestEmployees.clear();
-                maxProjects = numberOfProjects;
+                maxCount = propertyCount;
                 bestEmployees.add(employee);
-            } else if (numberOfProjects == maxProjects) {
+            } else if (propertyCount == maxCount) {
                 bestEmployees.add(employee);
             }
         }
         return bestEmployees;
     }
 
-    List<Employee> employeesWithMostSkills() {
-        if (employeesWithMostProjects().size() == 1) {
-            return employeesWithMostProjects();
-        } else {
-            List<Employee> employees = employeesWithMostProjects();
-            int maxSkills = -1;
-            List<Employee> bestEmployees = new ArrayList<>();
-
-            for (Employee employee : employees) {
-                int numberOfSkills = employee.getSkills().size();
-
-                if (numberOfSkills > maxSkills) {
-                    bestEmployees.clear();
-                    maxSkills = numberOfSkills;
-                    bestEmployees.add(employee);
-                } else if (numberOfSkills == maxSkills) {
-                    bestEmployees.add(employee);
-                }
-            }
-            return bestEmployees;
-        }
+    private LocalDate findLatestDate(List<Employee> employees) {
+        return employees.stream()
+                .map(Employee::getDate)
+                .max(LocalDate::compareTo)
+                .orElseThrow(() -> new NotFoundException("No employees with dates found."));
     }
-
-    public List<Employee> getEmployeesWithLatestDate() {
-        if (employeesWithMostSkills().size() == 1) {
-            return employeesWithMostSkills();
-        } else {
-            List<Employee> allEmployees = employeesWithMostSkills();
-            Optional<LocalDate> latestDate = allEmployees.stream()
-                    .map(Employee::getDate)
-                    .max(LocalDate::compareTo);
-
-            if (latestDate.isPresent()) {
-                LocalDate latest = latestDate.get();
-                return allEmployees.stream()
-                        .filter(employee -> employee.getDate().isEqual(latest))
-                        .collect(Collectors.toList());
-            } else {
-                return List.of();
-            }
-        }
-    }
-
-    public EmployeeDTO getEmployeeOfTheMonth() throws Exception {
-        int projectSize = employeesWithMostProjects().size();
-        int skillSize = employeesWithMostSkills().size();
-        UUID id;
-
-        if (employeesWithMostProjects().size() < 1 && employeesWithMostSkills().size() < 1) {
-            throw new Exception("Not enough projects or skills assigned!");
-        }
-
-        if (projectSize < 2) {
-            id = employeesWithMostProjects().get(0).getId();
-        } else if (skillSize < 2) {
-            id = employeesWithMostSkills().get(0).getId();
-        } else {
-            return mapstructMapper.employeeToEmployeeDTO(getEmployeesWithLatestDate().get(0));
-        }
-        return getEmployeeById(id);
-    }
-
 
     public AuthResponse login(AuthenticatorRequest authenticatorRequest) {
         Optional<Employee> response = this.employeeRepository.findUserByUsername(
