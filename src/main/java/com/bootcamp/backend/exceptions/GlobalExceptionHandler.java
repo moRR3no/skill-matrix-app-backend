@@ -27,7 +27,8 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler({
             WrongInputException.class,
-            AlreadyExistsException.class})
+            AlreadyExistsException.class,
+            NotEnoughObjectsException.class})
     public ResponseEntity<ApiError> handleException(
             RuntimeException e,
             HttpServletRequest request) {

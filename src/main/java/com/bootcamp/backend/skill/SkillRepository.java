@@ -9,6 +9,5 @@ import java.util.UUID;
 @Repository
 public interface SkillRepository extends JpaRepository<Skill, UUID> {
 
-    boolean existsByName (String name);
     Optional<Skill> findByName(String name);
 }

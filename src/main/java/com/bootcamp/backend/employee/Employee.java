@@ -46,7 +46,6 @@ public class Employee implements UserDetails {
     @JoinColumn(name = "manager_id")
     private Employee manager;
 
-    //TODO: Validation required to skills and projects
     @ManyToMany
     private List<Skill> skills;
 
@@ -56,7 +55,6 @@ public class Employee implements UserDetails {
     private String username;
 
     private String password;
-
 
     @Enumerated(EnumType.STRING)
     private Role role;

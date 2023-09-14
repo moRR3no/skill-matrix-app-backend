@@ -1,12 +1,9 @@
 package com.bootcamp.backend.employee;
 
-import com.bootcamp.backend.project.Project;
 import com.bootcamp.backend.project.ProjectDTO;
-import com.bootcamp.backend.skill.Skill;
 import com.bootcamp.backend.skill.SkillDTO;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import java.time.LocalDate;
 import java.util.List;

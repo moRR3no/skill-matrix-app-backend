@@ -2,6 +2,7 @@ package com.bootcamp.backend.employee;
 
 import com.bootcamp.backend.auth.AuthResponse;
 import com.bootcamp.backend.auth.AuthenticatorRequest;
+import com.bootcamp.backend.exceptions.AlreadyExistsException;
 import com.bootcamp.backend.exceptions.NotFoundException;
 import com.bootcamp.backend.exceptions.WrongInputException;
 import com.bootcamp.backend.mappers.MapStructMapper;
@@ -48,6 +49,10 @@ public class EmployeeService {
     }
 
     public EmployeeDTO saveEmployee(EmployeeDTO employeeDTO) {
+        UUID id = employeeDTO.getId();
+        if(employeeRepository.findById(id).isPresent()) {
+            throw new AlreadyExistsException("Employee with id " + id + " already exists");
+        }
         Employee employee = mapstructMapper.employeeDTOToEmployee(employeeDTO);
         setManagerFromDTO(employeeDTO, employee);
         Employee savedEmployee = employeeRepository.save(employee);
@@ -118,12 +123,12 @@ public class EmployeeService {
         }
     }
 
-    public EmployeeDTO getEmployeeOfTheMonth() throws Exception {
+    public EmployeeDTO getEmployeeOfTheMonth() {
         List<Employee> projectEmployees = employeesWithMostProjects();
         List<Employee> skillEmployees = employeesWithMostSkills();
 
         if (projectEmployees.isEmpty() && skillEmployees.isEmpty()) {
-            throw new Exception("Not enough projects or skills assigned!");
+            throw new NotFoundException("Not enough projects and skills assigned!");
         }
 
         if (projectEmployees.size() < 2) {

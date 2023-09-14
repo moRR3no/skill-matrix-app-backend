@@ -7,7 +7,7 @@ import com.bootcamp.backend.project.Project;
 import com.bootcamp.backend.project.ProjectDTO;
 import com.bootcamp.backend.project.ProjectRepository;
 import com.bootcamp.backend.project.ProjectService;
-import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -15,7 +15,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -35,93 +34,107 @@ class ProjectServiceTest {
     @InjectMocks
     private ProjectService underTest;
 
-    @Test
-    void underTestIsCreated() {
-        assertThat(underTest).isNotNull();
+    private Project project;
+
+    private ProjectDTO projectDTO;
+
+    private UUID id;
+
+    @BeforeEach
+    void setUp() {
+        id = UUID.randomUUID();
+        String name = "Project 1";
+        project = new Project();
+        project.setId(id);
+        project.setName(name);
+
+        projectDTO = new ProjectDTO();
+        projectDTO.setName(name);
+        projectDTO.setId(id);
     }
 
     @Test
-    @Disabled
     void canGetProjects() {
+        //given
+        List<Project> projectList = List.of(project);
+        when(projectRepository.findAll()).thenReturn(projectList);
+
         //when
-        underTest.getProjects();
+        List<ProjectDTO> projectDTOList = this.underTest.getProjects();
 
         //then
-        verify(projectRepository).findAll();
+        assertThat(mapstructMapper.projectsToProjectDTOs(projectList)).isEqualTo(projectDTOList);
+        verify(this.projectRepository).findAll();
     }
 
     @Test
-    void testGetProjects() {
+    void canSaveProject() {
         // given
-        List<Project> mockProjects = new ArrayList<>();
-        when(projectRepository.findAll()).thenReturn(mockProjects);
+        when(projectRepository.findByName(projectDTO.getName())).thenReturn(Optional.empty());
+        when(mapstructMapper.projectDTOToProject(projectDTO)).thenReturn(project);
+        when(projectRepository.save(project)).thenReturn(project);
+        when(mapstructMapper.projectToProjectDTO(project)).thenReturn(projectDTO);
 
         // when
-        List<ProjectDTO> result = underTest.getProjects();
+        ProjectDTO savedProjectDTO = underTest.saveProject(projectDTO);
 
         // then
-        assertNotNull(result);
-        assertEquals(0, result.size());
+        assertThat(savedProjectDTO).isEqualTo(projectDTO);
+        verify(projectRepository, times(1)).findByName(projectDTO.getName());
+        verify(projectRepository, times(1)).save(project);
     }
 
     @Test
-    void testGetProjectById() {
+    void canSaveProjectThrowsAlreadyExistsException() {
         // given
-        UUID projectId = UUID.randomUUID();
-        Project mockProject = new Project();
-        ProjectDTO mockProjectDTO = new ProjectDTO();
+        when(projectRepository.findByName(projectDTO.getName())).thenReturn(Optional.of(project));
 
-        // when
-        when(projectRepository.findById(projectId)).thenReturn(Optional.of(mockProject));
-        when(mapstructMapper.projectToProjectDTO(mockProject)).thenReturn(mockProjectDTO);
-
-        ProjectDTO result = underTest.getProjectById(projectId);
-
-        // then
-        assertNotNull(result);
-    }
-
-    @Test
-    void testGetProjectByIdNotFound() {
-        // given
-        UUID projectId = UUID.randomUUID();
-        when(projectRepository.findById(projectId)).thenReturn(Optional.empty());
-
-        // then
-        assertThrows(NotFoundException.class, () -> underTest.getProjectById(projectId));
-    }
-
-    @Test
-    void testSaveProjectAlreadyExists() {
-        // given
-        ProjectDTO projectDTO = new ProjectDTO();
-        projectDTO.setName("Test Project");
-        when(projectRepository.findByName("Test Project")).thenReturn(Optional.of(new Project()));
-
-        // then
+        // when - then
         assertThrows(AlreadyExistsException.class, () -> underTest.saveProject(projectDTO));
+        verify(projectRepository, times(1)).findByName(projectDTO.getName());
+        verify(projectRepository, never()).save(any(Project.class));
     }
 
     @Test
-    void testDeleteById() {
+    void canGetProjectById() {
         // given
-        UUID projectId = UUID.randomUUID();
-        when(projectRepository.existsById(projectId)).thenReturn(true);
+        when(projectRepository.findById(id)).thenReturn(Optional.of(project));
+        when(mapstructMapper.projectToProjectDTO(project)).thenReturn(projectDTO);
 
         // when
-        underTest.deleteById(projectId);
+        ProjectDTO result = underTest.getProjectById(id);
 
         // then
-        verify(projectRepository, times(1)).deleteById(projectId);
+        assertNotNull(result);
     }
 
     @Test
-    void testDeleteByIdNotFound() {
+    void canGetProjectByIdNotFound() {
         // given
-        UUID projectId = UUID.randomUUID();
-        when(projectRepository.existsById(projectId)).thenReturn(false);
+        when(projectRepository.findById(id)).thenReturn(Optional.empty());
+
+        // when - then
+        assertThrows(NotFoundException.class, () -> underTest.getProjectById(id));
+    }
+
+    @Test
+    void canDeleteById() {
+        // given
+        when(projectRepository.existsById(id)).thenReturn(true);
+
+        // when
+        underTest.deleteById(id);
 
         // then
-        assertThrows(NotFoundException.class, () -> underTest.deleteById(projectId));
+        verify(projectRepository, times(1)).deleteById(id);
+    }
+
+    @Test
+    void canDeleteByIdNotFound() {
+        // given
+        when(projectRepository.existsById(id)).thenReturn(false);
+
+        // when - then
+        assertThrows(NotFoundException.class, () -> underTest.deleteById(id));
     }
 }

@@ -1,15 +1,13 @@
 openapi: 3.0.0
 servers:
-  - description: SwaggerHub API Auto Mocking
-    url: https://virtserver.swaggerhub.com/KONRADPSTRONGOWSKI/skillmatx/1.0.0
   - description: Skill Matrix App
-    url: https://localhost:4200
+    url: https://localhost:8080
 info:
   version: "1.0.0"
   title: skill-matrix-app
   description: The API for the employee management system
 paths:
-  /api/employees:
+  /api/v1/employees:
     get:
       tags:
         - Employee
@@ -50,7 +48,7 @@ paths:
           description: Invalid input
 
 
-  /api/employees/{employeeId}:
+  /api/v1/employees/{employeeId}:
     get:
       tags:
         - Employee
@@ -127,6 +125,24 @@ paths:
           description: Invalid ID supplied
         '404':
           description: Employee not found
+
+  /api/v1/employeeOfTheMonth:
+    get:
+      tags:
+        - Employee
+      summary: Get employee of the month
+      description: Returns an employee with best stats
+      operationId: getEmployeeOfTheMonth
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/employee'
+              examples:
+                example1:
+                  $ref: '#/components/examples/employee'
 components:
   schemas:
     employee:
@@ -211,3 +227,12 @@ components:
           date: '21.11.2010'
           skills: ["Python", "Java", "JavaScript"]
           projects: ["Project 1", "Project 2", "Project 3"]
+    employee:
+      value:
+        - id: 0f0f771a-1826-4260-9f04-af80724410bb
+          name: John
+          surname: Moore
+          managerId: 0f0f771a-1826-4260-9f04-af80724410bb
+          date: '21.11.2010'
+          skills: [ "Python", "Java", "JavaScript", "Kotlin" ]
+          projects: [ "Project 1", "Project 2", "Project 3"]

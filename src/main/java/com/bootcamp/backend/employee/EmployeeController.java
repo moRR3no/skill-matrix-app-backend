@@ -29,7 +29,7 @@ public class EmployeeController {
     }
 
     @GetMapping("/employeeOfTheMonth")
-    public ResponseEntity<EmployeeDTO> getEmployeeOfTheMonth() throws Exception {
+    public ResponseEntity<EmployeeDTO> getEmployeeOfTheMonth() {
         return new ResponseEntity<>(employeeService.getEmployeeOfTheMonth(), HttpStatus.OK);
     }
 

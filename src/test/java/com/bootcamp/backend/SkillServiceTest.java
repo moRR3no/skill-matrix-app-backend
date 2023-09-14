@@ -14,13 +14,12 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -35,88 +34,105 @@ class SkillServiceTest {
     @InjectMocks
     private SkillService underTest;
 
+    private Skill skill;
+    private SkillDTO skillDTO;
+    private UUID id;
+
     @BeforeEach
     void setUp() {
-        // Initialize any necessary setup or mock behavior here
+        id = UUID.randomUUID();
+        String name = "Java";
+        skill = new Skill();
+        skill.setId(id);
+        skill.setName(name);
+
+        skillDTO = new SkillDTO();
+        skillDTO.setName(name);
+        skillDTO.setId(id);
     }
 
     @Test
-    void underTestIsCreated() {
-        assertThat(underTest).isNotNull();
+    void canGetSkills() {
+        //given
+        List<Skill> skillList = List.of(skill);
+        when(skillRepository.findAll()).thenReturn(skillList);
+
+        //when
+        List<SkillDTO> skillDTOList = this.underTest.getSkills();
+
+        //then
+        assertThat(mapstructMapper.skillsToSkillDTOs(skillList)).isEqualTo(skillDTOList);
+        verify(this.skillRepository).findAll();
     }
 
     @Test
-    void testGetSkills() {
+    void canSaveSkill() {
         // given
-        List<Skill> mockSkills = new ArrayList<>();
-        when(skillRepository.findAll()).thenReturn(mockSkills);
+        when(skillRepository.findByName(skillDTO.getName())).thenReturn(Optional.empty());
+        when(mapstructMapper.skillDTOToSkill(skillDTO)).thenReturn(skill);
+        when(skillRepository.save(skill)).thenReturn(skill);
+        when(mapstructMapper.skillToSkillDTO(skill)).thenReturn(skillDTO);
 
         // when
-        List<SkillDTO> result = underTest.getSkills();
+        SkillDTO savedSkillDTO = underTest.saveSkill(skillDTO);
 
         // then
-        assertNotNull(result);
-        assertEquals(0, result.size());
+        assertThat(savedSkillDTO).isEqualTo(skillDTO);
+        verify(skillRepository, times(1)).findByName(skillDTO.getName());
+        verify(skillRepository, times(1)).save(skill);
     }
 
     @Test
-    void testGetSkillById() {
+    void canSaveSkillThrowsAlreadyExistsException() {
         // given
-        UUID skillId = UUID.randomUUID();
-        Skill mockSkill = new Skill();
-        SkillDTO mockSkillDTO = new SkillDTO();
+        when(skillRepository.findByName(skillDTO.getName())).thenReturn(Optional.of(skill));
 
-        // when
-        when(skillRepository.findById(skillId)).thenReturn(Optional.of(mockSkill));
-        when(mapstructMapper.skillToSkillDTO(mockSkill)).thenReturn(mockSkillDTO);
-
-        SkillDTO result = underTest.getSkillById(skillId);
-
-        // then
-        assertNotNull(result);
-    }
-
-    @Test
-    void testGetSkillByIdNotFound() {
-        // given
-        UUID skillId = UUID.randomUUID();
-        when(skillRepository.findById(skillId)).thenReturn(Optional.empty());
-
-        // then
-        assertThrows(NotFoundException.class, () -> underTest.getSkillById(skillId));
-    }
-
-    @Test
-    void testSaveSkillAlreadyExists() {
-        // given
-        SkillDTO skillDTO = new SkillDTO();
-        skillDTO.setName("Test Skill");
-        when(skillRepository.findByName("Test Skill")).thenReturn(Optional.of(new Skill()));
-
-        // then
+        // when - then
         assertThrows(AlreadyExistsException.class, () -> underTest.saveSkill(skillDTO));
+        verify(skillRepository, times(1)).findByName(skillDTO.getName());
+        verify(skillRepository, never()).save(any(Skill.class));
     }
 
     @Test
-    void testDeleteById() {
+    void canGetSkillById() {
         // given
-        UUID skillId = UUID.randomUUID();
-        when(skillRepository.existsById(skillId)).thenReturn(true);
+        when(skillRepository.findById(id)).thenReturn(Optional.of(skill));
+        when(mapstructMapper.skillToSkillDTO(skill)).thenReturn(skillDTO);
+
+        //when
+        SkillDTO result = underTest.getSkillById(id);
+
+        // then
+        assertThat(result).isEqualTo(skillDTO);
+    }
+
+    @Test
+    void canGetSkillByIdNotFound() {
+        // given
+        when(skillRepository.findById(id)).thenReturn(Optional.empty());
+
+        // when - then
+        assertThrows(NotFoundException.class, () -> underTest.getSkillById(id));
+    }
+
+    @Test
+    void canDeleteById() {
+        // given
+        when(skillRepository.existsById(id)).thenReturn(true);
 
         // when
-        underTest.deleteById(skillId);
+        underTest.deleteById(id);
 
         // then
-        verify(skillRepository, times(1)).deleteById(skillId);
+        verify(skillRepository, times(1)).deleteById(id);
     }
 
     @Test
-    void testDeleteByIdNotFound() {
+    void canDeleteByIdNotFound() {
         // given
-        UUID skillId = UUID.randomUUID();
-        when(skillRepository.existsById(skillId)).thenReturn(false);
+        when(skillRepository.existsById(id)).thenReturn(false);
 
-        // then
-        assertThrows(NotFoundException.class, () -> underTest.deleteById(skillId));
+        // when - then
+        assertThrows(NotFoundException.class, () -> underTest.deleteById(id));
     }
 }
