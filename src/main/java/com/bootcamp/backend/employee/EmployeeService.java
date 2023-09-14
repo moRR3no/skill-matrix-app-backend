@@ -1,20 +1,14 @@
 package com.bootcamp.backend.employee;
 
-import com.bootcamp.backend.auth.AuthResponse;
-import com.bootcamp.backend.auth.AuthenticatorRequest;
 import com.bootcamp.backend.exceptions.AlreadyExistsException;
 import com.bootcamp.backend.exceptions.NotFoundException;
 import com.bootcamp.backend.exceptions.WrongInputException;
 import com.bootcamp.backend.mappers.MapStructMapper;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -24,12 +18,10 @@ public class EmployeeService {
 
     private final EmployeeRepository employeeRepository;
     private final MapStructMapper mapstructMapper;
-    private final PasswordEncoder passwordEncoder;
 
-    public EmployeeService(EmployeeRepository employeeRepository, MapStructMapper mapstructMapper, PasswordEncoder passwordEncoder) {
+    public EmployeeService(EmployeeRepository employeeRepository, MapStructMapper mapstructMapper) {
         this.employeeRepository = employeeRepository;
         this.mapstructMapper = mapstructMapper;
-        this.passwordEncoder = passwordEncoder;
     }
 
     public List<EmployeeDTO> getEmployees() {
@@ -50,7 +42,7 @@ public class EmployeeService {
 
     public EmployeeDTO saveEmployee(EmployeeDTO employeeDTO) {
         UUID id = employeeDTO.getId();
-        if(employeeRepository.findById(id).isPresent()) {
+        if (employeeRepository.findById(id).isPresent()) {
             throw new AlreadyExistsException("Employee with id " + id + " already exists");
         }
         Employee employee = mapstructMapper.employeeDTOToEmployee(employeeDTO);
@@ -115,12 +107,11 @@ public class EmployeeService {
         List<Employee> employees = employeesWithMostSkills();
         if (employees.size() == 1) {
             return employees;
-        } else {
-            LocalDate latestDate = findLatestDate(employees);
-            return employees.stream()
-                    .filter(employee -> employee.getDate().isEqual(latestDate))
-                    .collect(Collectors.toList());
         }
+        LocalDate latestDate = findLatestDate(employees);
+        return employees.stream()
+                .filter(employee -> employee.getDate().isEqual(latestDate))
+                .collect(Collectors.toList());
     }
 
     public EmployeeDTO getEmployeeOfTheMonth() {
@@ -141,22 +132,14 @@ public class EmployeeService {
     }
 
     private List<Employee> findEmployeesWithMost(List<Employee> employees, Function<Employee, List<?>> propertyExtractor) {
-        int maxCount = -1;
-        List<Employee> bestEmployees = new ArrayList<>();
+        int maxCount = employees.stream()
+                .map(employee -> propertyExtractor.apply(employee).size())
+                .max(Integer::compareTo)
+                .orElse(-1);
 
-        for (Employee employee : employees) {
-            List<?> propertyList = propertyExtractor.apply(employee);
-            int propertyCount = propertyList.size();
-
-            if (propertyCount > maxCount) {
-                bestEmployees.clear();
-                maxCount = propertyCount;
-                bestEmployees.add(employee);
-            } else if (propertyCount == maxCount) {
-                bestEmployees.add(employee);
-            }
-        }
-        return bestEmployees;
+        return employees.stream()
+                .filter(employee -> propertyExtractor.apply(employee).size() == maxCount)
+                .collect(Collectors.toList());
     }
 
     private LocalDate findLatestDate(List<Employee> employees) {
@@ -166,12 +149,5 @@ public class EmployeeService {
                 .orElseThrow(() -> new NotFoundException("No employees with dates found."));
     }
 
-    public AuthResponse login(AuthenticatorRequest authenticatorRequest) {
-        Optional<Employee> response = this.employeeRepository.findUserByUsername(
-                authenticatorRequest.username());
-        if (response.isPresent() && passwordEncoder.matches(authenticatorRequest.password(), response.get().getPassword())) {
-            return new AuthResponse(authenticatorRequest.username());
-        }
-        throw new ResponseStatusException(HttpStatusCode.valueOf(401));
-    }
+
 }

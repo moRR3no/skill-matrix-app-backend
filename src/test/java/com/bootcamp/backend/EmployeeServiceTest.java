@@ -134,7 +134,7 @@ class EmployeeServiceTest {
     }
 
     @Test
-    void testUpdateEmployeeWrongInput() {
+    void canUpdateEmployeeWrongInput() {
         //given
         UUID differentId = UUID.randomUUID();
 
@@ -143,7 +143,7 @@ class EmployeeServiceTest {
     }
 
     @Test
-    void testDeleteById() {
+    void canDeleteById() {
         // given
         when(employeeRepository.existsById(id)).thenReturn(true);
 
@@ -155,7 +155,7 @@ class EmployeeServiceTest {
     }
 
     @Test
-    void testDeleteByIdNotFound() {
+    void canDeleteByIdNotFound() {
         // given
         UUID employeeId = UUID.randomUUID();
         when(employeeRepository.existsById(employeeId)).thenReturn(false);

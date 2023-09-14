@@ -10,7 +10,6 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/v1/skills")
-@CrossOrigin(origins = {"*"})
 public class SkillController {
 
     private final SkillService skillService;

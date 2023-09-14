@@ -5,17 +5,16 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("api/v1/auth")
-@CrossOrigin
 public class AuthenticatorController {
 
-    private final EmployeeService employeeService;
+    private final AuthService authService;
 
-    public AuthenticatorController(EmployeeService employeeService) {
-        this.employeeService = employeeService;
+    public AuthenticatorController(AuthService authService) {
+        this.authService = authService;
     }
 
     @PostMapping("/login")
     public AuthResponse login (@RequestBody AuthenticatorRequest user) {
-        return employeeService.login(user);
+        return authService.login(user);
     }
 }
