@@ -116,7 +116,7 @@ class SkillServiceTest {
     }
 
     @Test
-    void canDeleteById() {
+    void canDeleteSkillById() {
         // given
         when(skillRepository.existsById(id)).thenReturn(true);
 
@@ -128,7 +128,7 @@ class SkillServiceTest {
     }
 
     @Test
-    void canDeleteByIdNotFound() {
+    void canDeleteSkillByIdNotFound() {
         // given
         when(skillRepository.existsById(id)).thenReturn(false);
 

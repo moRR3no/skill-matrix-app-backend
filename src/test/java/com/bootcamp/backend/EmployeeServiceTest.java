@@ -143,7 +143,7 @@ class EmployeeServiceTest {
     }
 
     @Test
-    void canDeleteById() {
+    void canDeleteEmployeeById() {
         // given
         when(employeeRepository.existsById(id)).thenReturn(true);
 
@@ -155,7 +155,7 @@ class EmployeeServiceTest {
     }
 
     @Test
-    void canDeleteByIdNotFound() {
+    void canDeleteEmployeeByIdNotFound() {
         // given
         UUID employeeId = UUID.randomUUID();
         when(employeeRepository.existsById(employeeId)).thenReturn(false);

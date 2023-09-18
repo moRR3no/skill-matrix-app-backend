@@ -118,7 +118,7 @@ class ProjectServiceTest {
     }
 
     @Test
-    void canDeleteById() {
+    void canDeleteProjectById() {
         // given
         when(projectRepository.existsById(id)).thenReturn(true);
 
@@ -130,7 +130,7 @@ class ProjectServiceTest {
     }
 
     @Test
-    void canDeleteByIdNotFound() {
+    void canDeleteProjectByIdNotFound() {
         // given
         when(projectRepository.existsById(id)).thenReturn(false);
 
