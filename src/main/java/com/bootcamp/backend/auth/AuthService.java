@@ -11,11 +11,15 @@ import org.springframework.web.server.ResponseStatusException;
 import java.util.Optional;
 
 @Service
-@RequiredArgsConstructor
 public class AuthService {
 
     EmployeeRepository employeeRepository;
     PasswordEncoder passwordEncoder;
+
+    public AuthService(EmployeeRepository employeeRepository, PasswordEncoder passwordEncoder) {
+        this.employeeRepository = employeeRepository;
+        this.passwordEncoder = passwordEncoder;
+    }
 
     public AuthResponse login(AuthenticatorRequest authenticatorRequest) {
         Optional<Employee> response = this.employeeRepository.findUserByUsername(
